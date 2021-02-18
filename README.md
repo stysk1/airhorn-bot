@@ -12,6 +12,7 @@ Clone this repository and run:
 npm install
 ```
 Once getting all the dependencies situated, you'll need to run the app and require permissions in your discord server. Getting the permissions for your server will require you to launch this URL:
+
 https://discord.com/oauth2/authorize?client_id=811718416150167632&scope=bot
 
 It should prompt you with your discord login and which server you would like to add it to.
@@ -54,4 +55,5 @@ The `debug` argument will read out all text from the discord server and the `deb
 
 ## References
 https://github.com/discordjs/discord.js
+
 https://www.w3schools.com/
