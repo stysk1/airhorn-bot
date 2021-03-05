@@ -1,7 +1,6 @@
 /*************************************************************************
 * !rants
-* Post how many Dan rants there are
-* TODO: Store these rants and make an embed to scroll through them
+* Post how many Dan rants there are\
 **************************************************************************/
 require('dotenv').config();
 const Storable = require('../lib/storable.js');
