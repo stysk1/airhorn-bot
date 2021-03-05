@@ -7,7 +7,7 @@ module.exports = {
    name: 'nextholiday',
    description: 'Retrieve the next holiday and have the bot post about it',
    usage: '!nextholiday',
-   execute(message) {
+   execute(message, args, emojis) {
       const whenHoliday = data => {
          message.channel.send(data);
       };

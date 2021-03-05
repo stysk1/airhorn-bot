@@ -9,7 +9,7 @@ module.exports = {
    name: 'gif',
    description: 'Post a gif from Tenor',
    usage: '!gif searchterm',
-   execute(message, args) {
+   execute(message, args, emojis) {
       let gifURL = '';
       if (!args.length) {
          return message.reply(`You didn't provide any arguments. Usage: '!gif searchterm'`);

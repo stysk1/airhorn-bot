@@ -163,7 +163,7 @@ client.on('message', message => {
    if (!client.commands.has(command)) return;
 
    try {
-      client.commands.get(command).execute(message, args);
+      client.commands.get(command).execute(message, args, emojis);
    } catch (error) {
       console.log(error);
    }

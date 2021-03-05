@@ -10,7 +10,7 @@ module.exports = {
    name: 'movie',
    description: 'Retrieve a movie based on your search parameters and embed it via the bot',
    usage: '!movie searchterm',
-   execute(message, args) {
+   execute(message, args, emojis) {
       let searchOptions = '';
       const omdb_url = `http://omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&`;
       if (!args.length) {
@@ -49,7 +49,7 @@ module.exports = {
                   .addField('Genre', json.Genre, true)
                   .setImage(poster)
                   .setDescription(json.Plot)
-                  .setFooter('Provided to you by the OMDB API and Cockmeat2000');
+                  .setFooter('Provided to you by the OMDB API and the Airhorn Bot');
                message.channel.send(movieEmbed);
             } catch (e) {
                console.error(e);
