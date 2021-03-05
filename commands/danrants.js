@@ -4,12 +4,14 @@
 * TODO: Store these rants and make an embed to scroll through them
 **************************************************************************/
 require('dotenv').config();
+const Storable = require('../lib/storable.js');
 module.exports = {
    name: 'rants',
    description: 'Post how many Dan rants there are',
    usage: '!rants',
-   async execute(message) {
+   async execute(message, args, emojis) {
       let messages = [];
+      let rants = [];
       let lastID;
       while(true){
          const fetchedMessages = await message.channel.messages.fetch({
@@ -23,11 +25,15 @@ module.exports = {
          messages = messages.concat(Array.from(fetchedMessages.values()));
          lastID = fetchedMessages.lastKey();
       }
-      let count = 0;
       for (const rant of messages) {
-         console.log(rant.content);
-         count++;
+         rants.push(rant.content);
       }
-      message.channel.send(`Dan's rant count = ${count}`);
+      message.channel.send(`Dan's rant count = ${rants.length}`);
+      const store = new Storable(rants);
+      const author = message.author;
+      console.log(store.data);
+      message.channel.send(store.toEmbed())
+      .then(message => store.react(message, author))
+      .catch(error => console.error(`Error reacting or embedding: ${error}`))
    }
 }
