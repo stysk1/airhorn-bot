@@ -4,8 +4,8 @@
 require('dotenv').config();
 
 const auth = require('./auth.json');
-const { channels } = require('./channels.js');
-const { emojis } = require('./emojis.js');
+const { channels } = require('./lib/channels.js');
+const { emojis } = require('./lib/emojis.js');
 const { updates7d2d } = require('./scripts/7d2d.js');
 const { fetchHoliday, todayHoliday } = require('./scripts/holidays.js');
 const { prefix, morning_cron, evening_cron } = require('./config.json');
