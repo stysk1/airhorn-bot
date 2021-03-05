@@ -1,6 +1,6 @@
 /*************************************************************************
 * !rants
-* Post how many Dan rants there are\
+* Post how many Dan rants there are
 **************************************************************************/
 require('dotenv').config();
 const Storable = require('../lib/storable.js');
