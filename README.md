@@ -36,14 +36,16 @@ The `debug` argument will read out all text from the discord server and the `deb
 ## Important Files
 * discord.js
 	* the main JS file to run the bot
-* channels.js
-	* the file containing a list of your channels
-	* add the IDs of your channels to your `.env` and declare your channel vars in here
-* emojis.js
-	* the file containing a list of your emojis
-	* add the names of your emojis as shown in the server and declare the emoji variables here
 * commands/
 	* exportable modules to your discord.js to execute when called via name and the `!` prefix
+* libs/
+	* libraries used within the bot that include classes and data structures
+	* channels.js
+		* the file containing a list of your channels
+		* add the IDs of your channels to your `.env` and declare your channel vars in here
+	* emojis.js
+		* the file containing a list of your emojis
+		* add the names of your emojis as shown in the server and declare the emoji variables here
 * media/
 	* any pictures, videos, etc. of media to be cached for your bot
 * scripts/
