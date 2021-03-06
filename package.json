@@ -6,7 +6,8 @@
 	"author": "Kevin Stys",
 	"scripts": {
 		"pretest": "eslint --fix --ext .js .",
-		"test": "echo testing complete for now"
+		"test": "echo testing complete for now",
+		"start": "node discord.js debug"
 	},
 	"dependencies": {
 		"discord.js": "^12.5.1",
