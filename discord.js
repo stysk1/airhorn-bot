@@ -3,7 +3,6 @@
 ****************************************/
 require('dotenv').config();
 
-const auth = require('./auth.json');
 const { channels } = require('./lib/channels.js');
 const { emojis } = require('./lib/emojis.js');
 const { updates7d2d } = require('./scripts/7d2d.js');
@@ -170,4 +169,4 @@ client.on('message', message => {
    
 });
 
-client.login(auth.token);
+client.login(process.env.AUTH_TOKEN);
