@@ -6,7 +6,7 @@ module.exports = {
    name: 'send',
    description: 'Send a message via the bot to a given channel',
    usage: '!send channelID message',
-   execute(mmessage, args, emojis) {
+   execute(message, args, emojis) {
       if (args.length < 2) {
          return message.reply(`You didn't provide enough arguments. Usage: '!send channelID message'`);
       } else if (args.length >= 2) {
