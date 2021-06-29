@@ -4,6 +4,7 @@
 ****************************************/
 require('dotenv').config();
 const fetch = require('node-fetch');
+const Storable = require('../lib/storable.js');
 
 module.exports = {
    name: 'gif',
@@ -25,7 +26,12 @@ module.exports = {
       (async function(){
          const response = await fetch(gifURL);
          const json = await response.json();
-         message.channel.send(json.results[0].url);
+         const store = new Storable(json.results);
+         const author = message.author;
+         console.log(store.data);
+         message.channel.send(store.gifEmbed())
+         .then(message => store.react(message, author))
+         .catch(error => console.error(`Error reacting or embedding: ${error}`))
       })();
    }
 }
