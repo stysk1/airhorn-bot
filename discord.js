@@ -89,10 +89,12 @@ client.on('ready', () => {
    cron.schedule(morning_cron, () => { 
       todayHoliday(workingToday);
       fetch7d2dUpdates();
+      console.log('MORNING CRON SUCCESS');
    });
    cron.schedule(evening_cron, () => {
       todayHoliday(workingToday);
       fetch7d2dUpdates();
+      console.log('EVENING CRON SUCCESS');
    });
 
    // TEST CRON JOB: ONLY UNCOMMENT WHEN DEBUGGING AND KILL UPON FIRST EXECUTION
