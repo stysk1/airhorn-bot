@@ -1,5 +1,5 @@
 {
 	"prefix": "!",
-   "morning_cron": "00 09 * * *",
-   "evening_cron": "00 17 * * *"
+   "morning_cron": "0 9 * * *",
+   "evening_cron": "0 17 * * *"
 }

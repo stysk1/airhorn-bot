@@ -64,8 +64,12 @@ client.on('ready', () => {
    /******************************************************
    * Configure cron jobs for morning and evening updates *
    *******************************************************/
-   const workingToday = holiday => {
-      channels.channelNormalChat.send(`Are any of you working today? It's ${holiday}`);
+   const workingToday = (holiday) => {
+      if(holiday) {
+         channels.channelNormalChat.send(`Are any of you working today? It's ${holiday}`);
+      } else {
+         console.log("Today is not a holiday")
+      }
    };
    const fetch7d2dUpdates = () => {
       channels.channel7d2d.messages.fetch()
@@ -86,13 +90,11 @@ client.on('ready', () => {
          updates7d2d(newUpdate);
       });
    }
-   cron.schedule(morning_cron, () => { 
-      todayHoliday(workingToday);
-      fetch7d2dUpdates();
+   cron.schedule(morning_cron, () => {
+      workingToday(todayHoliday());
       console.log('MORNING CRON SUCCESS');
    });
    cron.schedule(evening_cron, () => {
-      todayHoliday(workingToday);
       fetch7d2dUpdates();
       console.log('EVENING CRON SUCCESS');
    });
