@@ -68,11 +68,18 @@ client.on('ready', () => {
       channels.channelNormalChat.send(`Are any of you working today? It's ${holiday}`);
    };
    const fetch7d2dUpdates = () => {
+      if (!channels.channel7d2d) {
+         console.warn('fetch7d2dUpdates: channel7d2d is not set, skipping');
+         return;
+      }
       channels.channel7d2d.messages.fetch()
       .then(messages => {
-         const latestUpdate = messages.filter(m => m.author.bot).values().next().value.embeds[0].title;
+         const lastBotMsg = messages.filter(m => m.author.bot).first();
+         const latestUpdate = (lastBotMsg && lastBotMsg.embeds && lastBotMsg.embeds[0])
+            ? lastBotMsg.embeds[0].title
+            : null;
          const newUpdate = update => {
-            if (update.title != '' && latestUpdate != update.title) {
+            if (update.title && update.title !== latestUpdate) {
                let newsEmbed = new Discord.MessageEmbed()
                   .setColor('#ebc40f')
                   .setTitle(update.title)
@@ -80,11 +87,13 @@ client.on('ready', () => {
                   .setDescription(update.description)
                   .setImage('https://7daystodie.com/images/header_g.png')
                   .setFooter('Provided to you by Airhorn Bot');
-               channels.channel7d2d.send(newsEmbed);
+               channels.channel7d2d.send(newsEmbed)
+                  .catch(err => console.error('Failed to send 7d2d embed:', err));
             }
          };
          updates7d2d(newUpdate);
-      });
+      })
+      .catch(err => console.error('fetch7d2dUpdates failed:', err));
    }
    cron.schedule(morning_cron, () => { 
       todayHoliday(workingToday);
