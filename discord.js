@@ -18,6 +18,8 @@ const fs = require('fs');
 const cron = require('node-cron');
 const logger = require('winston');
 
+let cronsScheduled = false;
+
 /***************************************
 * Configure logger settings            *
 ****************************************/
@@ -64,6 +66,9 @@ client.on('ready', () => {
    /******************************************************
    * Configure cron jobs for morning and evening updates *
    *******************************************************/
+   if (cronsScheduled) return;
+   cronsScheduled = true;
+
    const workingToday = holiday => {
       channels.channelNormalChat.send(`Are any of you working today? It's ${holiday}`);
    };
