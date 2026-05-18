@@ -65,9 +65,17 @@ client.on('ready', () => {
    * Configure cron jobs for morning and evening updates *
    *******************************************************/
    const workingToday = holiday => {
+      if (!channels.channelNormalChat) {
+         console.warn('workingToday: channelNormalChat unavailable, skipping');
+         return;
+      }
       channels.channelNormalChat.send(`Are any of you working today? It's ${holiday}`);
    };
    const fetch7d2dUpdates = () => {
+      if (!channels.channel7d2d) {
+         console.warn('fetch7d2dUpdates: channel7d2d unavailable, skipping');
+         return;
+      }
       channels.channel7d2d.messages.fetch()
       .then(messages => {
          const latestUpdate = messages.filter(m => m.author.bot).values().next().value.embeds[0].title;
