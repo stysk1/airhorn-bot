@@ -15,7 +15,6 @@
 		"jsdom": "^16.6.0",
 		"node-cron": "^2.0.3",
 		"save": "^2.4.0",
-		"sqlite3": "^5.0.2",
 		"winston": "^3.3.3"
 	},
 	"devDependencies": {
