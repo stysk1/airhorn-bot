@@ -86,22 +86,23 @@ client.on('ready', () => {
          updates7d2d(newUpdate);
       });
    }
-   cron.schedule(morning_cron, () => { 
+   const cronOpts = { timezone: 'America/New_York' };
+   cron.schedule(morning_cron, () => {
       todayHoliday(workingToday);
       fetch7d2dUpdates();
       console.log('MORNING CRON SUCCESS');
-   });
+   }, cronOpts);
    cron.schedule(evening_cron, () => {
       todayHoliday(workingToday);
       fetch7d2dUpdates();
       console.log('EVENING CRON SUCCESS');
-   });
+   }, cronOpts);
 
    // TEST CRON JOB: ONLY UNCOMMENT WHEN DEBUGGING AND KILL UPON FIRST EXECUTION
    if (process.argv[2] === 'debug' && process.argv[3] === 'cron') {
       cron.schedule('* * * * * *', () => {
          //...something to test here
-      }); 
+      }, cronOpts);
    }
 
 });
