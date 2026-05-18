@@ -116,10 +116,13 @@ client.on('message', message => {
    * STEVE ONLY
    ****************************************/
    if (message.author.id === process.env.STEVE_ID) {
-      try {
-         client.triggers.get('steve').execute(message, emojis);
-      } catch (error) {
-         console.log(error);
+      const steveTrigger = client.triggers.get('steve');
+      if (steveTrigger) {
+         try {
+            steveTrigger.execute(message, emojis);
+         } catch (error) {
+            console.log(error);
+         }
       }
    }
 
