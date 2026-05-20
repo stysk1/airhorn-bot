@@ -3,6 +3,7 @@
 * Grab and post from the Tenor API
 ****************************************/
 require('dotenv').config();
+const logger = require('../logger');
 const fetch = require('node-fetch');
 const Storable = require('../lib/storable.js');
 
@@ -28,7 +29,7 @@ module.exports = {
          const json = await response.json();
          const store = new Storable(json.results);
          const author = message.author;
-         console.log(store.data);
+         logger.info(store.data);
          message.channel.send(store.gifEmbed())
          .then(message => store.react(message, author))
          .catch(error => console.error(`Error reacting or embedding: ${error}`))
