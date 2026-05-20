@@ -14,11 +14,12 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.triggers = new Discord.Collection();
 
-const fs = require('fs');
 const cron = require('node-cron');
+const db = require('./db');
+const fs = require('fs');
 const logger = require('./logger');
 
-const db = require('./db');
+let cronsScheduled = false;
 
 /***************************************
 * Preload client commands and triggers *
@@ -57,6 +58,9 @@ client.on('ready', () => {
    /******************************************************
    * Configure cron jobs for morning and evening updates *
    *******************************************************/
+   if (cronsScheduled) return;
+   cronsScheduled = true;
+
    const workingToday = holiday => {
       if (!channels.channelNormalChat) {
          logger.warn('workingToday: channelNormalChat unavailable, skipping');
