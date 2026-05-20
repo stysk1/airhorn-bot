@@ -17,7 +17,6 @@
 		"node-fetch": "^2.7.0",
 		"pg": "^8.14.1",
 		"save": "^2.4.0",
-		"sqlite3": "^5.0.2",
 		"winston": "^3.13.0"
 	},
 	"devDependencies": {
