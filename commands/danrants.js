@@ -3,6 +3,7 @@
 * Post how many Dan rants there are
 **************************************************************************/
 require('dotenv').config();
+const logger = require('../logger');
 const Storable = require('../lib/storable.js');
 module.exports = {
    name: 'rants',
@@ -30,7 +31,7 @@ module.exports = {
       message.channel.send(`Dan's rant count = ${rants.length}`);
       const store = new Storable(rants);
       const author = message.author;
-      console.log(store.data);
+      logger.info(store.data);
       message.channel.send(store.toEmbed())
       .then(message => store.react(message, author))
       .catch(error => console.error(`Error reacting or embedding: ${error}`))
