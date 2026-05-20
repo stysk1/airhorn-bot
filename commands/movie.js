@@ -3,6 +3,7 @@
 * Grab from the OMDB API to get movie info
 ****************************************/
 require('dotenv').config();
+const logger = require('../logger');
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
 
@@ -28,12 +29,12 @@ module.exports = {
          let json = await response.json();
 
          if (json.Response === 'True') {
-            console.log(json.Search[0]);
+            logger.info(json.Search[0]);
             try {
                const foundMovie = `${omdb_url}i=${json.Search[0].imdbID}&plot=short&r=json&tomatoes=true`;
                response = await fetch(foundMovie);
                json = await response.json();
-               console.log(json)
+               logger.info(json)
 
                let url = '';
                let poster = '';
@@ -55,7 +56,7 @@ module.exports = {
                console.error(e);
             }
          } else {
-            console.log(json);
+            logger.info(json);
             message.channel.send("Movie not found or bad search parameters");
          }
       })();
