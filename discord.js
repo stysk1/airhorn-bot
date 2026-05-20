@@ -16,16 +16,9 @@ client.triggers = new Discord.Collection();
 
 const fs = require('fs');
 const cron = require('node-cron');
-const logger = require('winston');
+const logger = require('./logger');
 
-/***************************************
-* Configure logger settings            *
-****************************************/
-logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console(), {
-   colorize: true,
-});
-logger.level = 'debug';
+const db = require('./db');
 
 /***************************************
 * Preload client commands and triggers *
@@ -44,11 +37,11 @@ for (const file of triggers) {
       client.triggers.set(trigger.name, trigger);
    }
 }
-if (process.argv[2] === 'debug') console.log(client.commands);
-if (process.argv[2] === 'debug') console.log(client.triggers);
+if (process.argv[2] === 'debug') logger.debug(client.commands);
+if (process.argv[2] === 'debug') logger.debug(client.triggers);
 
 client.on('ready', () => {
-   console.log(`Logged in as ${client.user.tag}!`);
+   logger.info(`Logged in as ${client.user.tag}!`);
    client.user.setActivity('with binary', {type: 'PLAYING'});
 
    /***************************************
@@ -65,14 +58,24 @@ client.on('ready', () => {
    * Configure cron jobs for morning and evening updates *
    *******************************************************/
    const workingToday = holiday => {
-      channels.channelNormalChat.send(`Are any of you working today? It's ${holiday}`);
+      channels.chattyMcChatFace.send(`Are any of you working today? It's ${holiday}`);
    };
    const fetch7d2dUpdates = () => {
       channels.channel7d2d.messages.fetch()
       .then(messages => {
-         const latestUpdate = messages.filter(m => m.author.bot).values().next().value.embeds[0].title;
+         const botMessages = messages.filter(m => m.author.bot).values();
+         let latestUpdate = '';
+
+         // Iterate through the messages to find the first one with an embed
+         for (let msg of botMessages) {
+            if (msg.embeds.length > 0) {
+               latestUpdate = msg.embeds[0].title;
+               break; // Stop once we find the first valid embed
+            }
+         }
+
          const newUpdate = update => {
-            if (update.title != '' && latestUpdate != update.title) {
+            if (update.title !== '' && latestUpdate !== update.title) {
                let newsEmbed = new Discord.MessageEmbed()
                   .setColor('#ebc40f')
                   .setTitle(update.title)
@@ -80,21 +83,22 @@ client.on('ready', () => {
                   .setDescription(update.description)
                   .setImage('https://7daystodie.com/images/header_g.png')
                   .setFooter('Provided to you by Airhorn Bot');
-               channels.channel7d2d.send(newsEmbed);
+               channels.channel7d2d.send({ embeds: [newsEmbed] });
             }
          };
+
          updates7d2d(newUpdate);
-      });
-   }
+      }).catch(console.error);
+   };
    cron.schedule(morning_cron, () => { 
       todayHoliday(workingToday);
       fetch7d2dUpdates();
-      console.log('MORNING CRON SUCCESS');
+      logger.debug('MORNING CRON SUCCESS');
    });
    cron.schedule(evening_cron, () => {
       todayHoliday(workingToday);
       fetch7d2dUpdates();
-      console.log('EVENING CRON SUCCESS');
+      logger.debug('EVENING CRON SUCCESS');
    });
 
    // TEST CRON JOB: ONLY UNCOMMENT WHEN DEBUGGING AND KILL UPON FIRST EXECUTION
@@ -108,7 +112,7 @@ client.on('ready', () => {
 
 
 client.on('message', message => {
-   if (process.argv[2] === 'debug') console.log(`${message.author.username}: ${message}`); // debug param shows all messages
+   if (process.argv[2] === 'debug') logger.debug(`${message.author.username}: ${message}`); // debug param shows all messages
    const args = message.content.slice(prefix.length).trim().split(/ +/);
    const command = args.shift().toLowerCase();
 
@@ -119,7 +123,7 @@ client.on('message', message => {
       try {
          client.triggers.get('steve').execute(message, emojis);
       } catch (error) {
-         console.log(error);
+         logger.error(error);
       }
    }
 
@@ -130,7 +134,7 @@ client.on('message', message => {
       try {
          client.triggers.get('kevin').execute(message, emojis);
       } catch (error) {
-         console.log(error);
+         logger.error(error);
       }
    }
 
@@ -141,9 +145,21 @@ client.on('message', message => {
       try {
          client.triggers.get('dan').execute(message);
       } catch (error) {
-         console.log(error);
+         logger.error(error);
       }
    }
+
+   /***************************************
+   * NICK ONLY
+   ****************************************/
+   if (message.author.id === process.env.NICK_ID) {
+      try {
+         client.triggers.get('nick').execute(message);
+      } catch (error) {
+         logger.error(error);
+      }
+   }
+
 
    /***************************************
    * All misc text based triggers
@@ -153,7 +169,7 @@ client.on('message', message => {
          trigger.execute(message, emojis);
       }
    } catch (error) {
-      console.log(error);
+      logger.error(error);
    }
 
 
@@ -166,7 +182,7 @@ client.on('message', message => {
    try {
       client.commands.get(command).execute(message, args, emojis);
    } catch (error) {
-      console.log(error);
+      logger.error(error);
    }
    
 });
