@@ -16,16 +16,9 @@ client.triggers = new Discord.Collection();
 
 const fs = require('fs');
 const cron = require('node-cron');
-const logger = require('winston');
+const logger = require('./logger');
 
-/***************************************
-* Configure logger settings            *
-****************************************/
-logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console(), {
-   colorize: true,
-});
-logger.level = 'debug';
+const db = require('./db');
 
 /***************************************
 * Preload client commands and triggers *
@@ -44,11 +37,11 @@ for (const file of triggers) {
       client.triggers.set(trigger.name, trigger);
    }
 }
-if (process.argv[2] === 'debug') console.log(client.commands);
-if (process.argv[2] === 'debug') console.log(client.triggers);
+if (process.argv[2] === 'debug') logger.debug(client.commands);
+if (process.argv[2] === 'debug') logger.debug(client.triggers);
 
 client.on('ready', () => {
-   console.log(`Logged in as ${client.user.tag}!`);
+   logger.info(`Logged in as ${client.user.tag}!`);
    client.user.setActivity('with binary', {type: 'PLAYING'});
 
    /***************************************
@@ -66,21 +59,24 @@ client.on('ready', () => {
    *******************************************************/
    const workingToday = holiday => {
       if (!channels.channelNormalChat) {
-         console.warn('workingToday: channelNormalChat unavailable, skipping');
+         logger.warn('workingToday: channelNormalChat unavailable, skipping');
          return;
       }
       channels.channelNormalChat.send(`Are any of you working today? It's ${holiday}`);
    };
    const fetch7d2dUpdates = () => {
       if (!channels.channel7d2d) {
-         console.warn('fetch7d2dUpdates: channel7d2d unavailable, skipping');
+         logger.warn('fetch7d2dUpdates: channel7d2d unavailable, skipping');
          return;
       }
       channels.channel7d2d.messages.fetch()
       .then(messages => {
-         const latestUpdate = messages.filter(m => m.author.bot).values().next().value.embeds[0].title;
+         const lastBotMsg = messages.filter(m => m.author.bot).first();
+         const latestUpdate = (lastBotMsg && lastBotMsg.embeds && lastBotMsg.embeds[0])
+            ? lastBotMsg.embeds[0].title
+            : null;
          const newUpdate = update => {
-            if (update.title != '' && latestUpdate != update.title) {
+            if (update.title && update.title !== latestUpdate) {
                let newsEmbed = new Discord.MessageEmbed()
                   .setColor('#ebc40f')
                   .setTitle(update.title)
@@ -88,21 +84,24 @@ client.on('ready', () => {
                   .setDescription(update.description)
                   .setImage('https://7daystodie.com/images/header_g.png')
                   .setFooter('Provided to you by Airhorn Bot');
-               channels.channel7d2d.send(newsEmbed);
+               channels.channel7d2d.send(newsEmbed)
+                  .catch(err => logger.error('Failed to send 7d2d embed:', err));
             }
          };
+
          updates7d2d(newUpdate);
-      });
+      })
+      .catch(err => logger.error('fetch7d2dUpdates failed:', err));
    }
    cron.schedule(morning_cron, () => { 
       todayHoliday(workingToday);
       fetch7d2dUpdates();
-      console.log('MORNING CRON SUCCESS');
+      logger.debug('MORNING CRON SUCCESS');
    });
    cron.schedule(evening_cron, () => {
       todayHoliday(workingToday);
       fetch7d2dUpdates();
-      console.log('EVENING CRON SUCCESS');
+      logger.debug('EVENING CRON SUCCESS');
    });
 
    // TEST CRON JOB: ONLY UNCOMMENT WHEN DEBUGGING AND KILL UPON FIRST EXECUTION
@@ -116,7 +115,7 @@ client.on('ready', () => {
 
 
 client.on('message', message => {
-   if (process.argv[2] === 'debug') console.log(`${message.author.username}: ${message}`); // debug param shows all messages
+   if (process.argv[2] === 'debug') logger.debug(`${message.author.username}: ${message}`); // debug param shows all messages
    const args = message.content.slice(prefix.length).trim().split(/ +/);
    const command = args.shift().toLowerCase();
 
@@ -127,7 +126,7 @@ client.on('message', message => {
       try {
          client.triggers.get('steve').execute(message, emojis);
       } catch (error) {
-         console.log(error);
+         logger.error(error);
       }
    }
 
@@ -138,7 +137,7 @@ client.on('message', message => {
       try {
          client.triggers.get('kevin').execute(message, emojis);
       } catch (error) {
-         console.log(error);
+         logger.error(error);
       }
    }
 
@@ -149,9 +148,21 @@ client.on('message', message => {
       try {
          client.triggers.get('dan').execute(message);
       } catch (error) {
-         console.log(error);
+         logger.error(error);
       }
    }
+
+   /***************************************
+   * NICK ONLY
+   ****************************************/
+   if (message.author.id === process.env.NICK_ID) {
+      try {
+         client.triggers.get('nick').execute(message);
+      } catch (error) {
+         logger.error(error);
+      }
+   }
+
 
    /***************************************
    * All misc text based triggers
@@ -161,7 +172,7 @@ client.on('message', message => {
          trigger.execute(message, emojis);
       }
    } catch (error) {
-      console.log(error);
+      logger.error(error);
    }
 
 
@@ -174,7 +185,7 @@ client.on('message', message => {
    try {
       client.commands.get(command).execute(message, args, emojis);
    } catch (error) {
-      console.log(error);
+      logger.error(error);
    }
    
 });

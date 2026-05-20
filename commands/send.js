@@ -2,6 +2,7 @@
 * !send channelID message
 * Send a message via the bot to a given channel
 ************************************************/
+const logger = require('../logger');
 module.exports = {
    name: 'send',
    description: 'Send a message via the bot to a given channel',
@@ -15,7 +16,7 @@ module.exports = {
             sendMessage += args[i];
             if (i < args.length-1) sendMessage += ' ';
          }
-         console.log(`channel: ${args[0]}, message: ${sendMessage}`);
+         logger.info(`channel: ${args[0]}, message: ${sendMessage}`);
          const channel = message.client.channels.cache.get(args[0]);
          channel.send(sendMessage);
       }
