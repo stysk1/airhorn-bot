@@ -14,22 +14,12 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.triggers = new Discord.Collection();
 
-
+const cron = require('node-cron');
 const db = require('./db');
 const fs = require('fs');
-const cron = require('node-cron');
 const logger = require('./logger');
 
 let cronsScheduled = false;
-
-/***************************************
-* Configure logger settings            *
-****************************************/
-logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console(), {
-   colorize: true,
-});
-logger.level = 'debug';
 
 /***************************************
 * Preload client commands and triggers *
