@@ -2,6 +2,7 @@
 * Dependencies
 ****************************************/
 const fetch = require('node-fetch');
+const logger = require('../logger');
 const { JSDOM } = require('jsdom');
 
 const fetchURL = 'https://7daystodie.com/news';
@@ -13,7 +14,7 @@ const updates7d2d = callback => {
    fetch(fetchURL)
    .then(response => response.text())
    .then(text => {
-      console.log("Received data");
+      logger.info("7D2D Received data");
       const dom = new JSDOM(text).window.document;
       const newsTitle = dom.getElementsByTagName("article")[0].getElementsByTagName("A")[0].innerHTML.trim();
       const newsLink = dom.getElementsByTagName("article")[0].getElementsByTagName("A")[0].href;
@@ -59,7 +60,7 @@ const updates7d2d = callback => {
          title: newsTitle
       });
    })
-   .catch(error => console.error(`Error receiving website data: ${error}`))
+   .catch(error => logger.error(`Error receiving website data: ${error}`))
 }
 
 module.exports = { updates7d2d };

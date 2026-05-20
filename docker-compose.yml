@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  airhorn-bot:
+    build: .
+    container_name: airhorn-bot
+    volumes:
+      - .:/app            # Syncs local code with the container
+      - ./logs:/app/logs  # Mounts logs folder to persist logs
+    command: node discord.js debug
+    restart: always
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    networks:
+      - pg-network
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+
+networks:
+  pg-network:
+    external: true
