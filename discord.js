@@ -58,11 +58,15 @@ client.on('ready', () => {
    * Configure cron jobs for morning and evening updates *
    *******************************************************/
    const workingToday = holiday => {
-      channels.chattyMcChatFace.send(`Are any of you working today? It's ${holiday}`);
+      if (!channels.channelNormalChat) {
+         logger.warn('workingToday: channelNormalChat unavailable, skipping');
+         return;
+      }
+      channels.channelNormalChat.send(`Are any of you working today? It's ${holiday}`);
    };
    const fetch7d2dUpdates = () => {
       if (!channels.channel7d2d) {
-         console.warn('fetch7d2dUpdates: channel7d2d is not set, skipping');
+         logger.warn('fetch7d2dUpdates: channel7d2d unavailable, skipping');
          return;
       }
       channels.channel7d2d.messages.fetch()
@@ -81,13 +85,13 @@ client.on('ready', () => {
                   .setImage('https://7daystodie.com/images/header_g.png')
                   .setFooter('Provided to you by Airhorn Bot');
                channels.channel7d2d.send(newsEmbed)
-                  .catch(err => console.error('Failed to send 7d2d embed:', err));
+                  .catch(err => logger.error('Failed to send 7d2d embed:', err));
             }
          };
 
          updates7d2d(newUpdate);
       })
-      .catch(err => console.error('fetch7d2dUpdates failed:', err));
+      .catch(err => logger.error('fetch7d2dUpdates failed:', err));
    }
    cron.schedule(morning_cron, () => { 
       todayHoliday(workingToday);
